@@ -1,4 +1,3 @@
-import json
 import os
 
 import numpy as np
@@ -72,4 +71,6 @@ def speech2text(
         return_timestamps=return_timestamps,
         generate_kwargs={"task": "transcribe", "language": translate_from},
     )
-    return json.dumps(prediction["text"].strip())
+    output = prediction["text"].strip()
+
+    return output

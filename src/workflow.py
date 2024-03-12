@@ -10,15 +10,15 @@ from .tasks.translate_text import translate_text
 
 @workflow
 def video_translation_wf(
-    video_file: FlyteFile = "https://github.com/samhita-alla/sad-talker-on-flyte/assets/27777173/d6b64d77-0379-4692-bce0-064033231fee",
-    translate_from: str = "English",
-    translate_to: str = "Spanish",
+    video_file: FlyteFile = "https://github.com/samhita-alla/video-translation/assets/27777173/f83a02d8-5894-4cf5-af31-c3588ce442a0",
+    translate_from: str = "Chinese",
+    translate_to: str = "English",
     checkpoint: str = "openai/whisper-large-v2",
     output_ext: str = "mp3",
     chunk_length: float = 30.0,
     return_timestamps: bool = False,
-    ref_pose: FlyteFile = "https://github.com/samhita-alla/sad-talker-on-flyte/assets/27777173/d6b64d77-0379-4692-bce0-064033231fee",
-    ref_eyeblink: FlyteFile = "https://github.com/samhita-alla/sad-talker-on-flyte/assets/27777173/d6b64d77-0379-4692-bce0-064033231fee",
+    ref_pose: FlyteFile = "https://github.com/samhita-alla/video-translation/assets/27777173/f83a02d8-5894-4cf5-af31-c3588ce442a0",
+    ref_eyeblink: FlyteFile = "https://github.com/samhita-alla/video-translation/assets/27777173/f83a02d8-5894-4cf5-af31-c3588ce442a0",
     pose_style: int = 0,
     batch_size: int = 2,
     expression_scale: float = 1.0,

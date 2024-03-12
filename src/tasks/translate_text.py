@@ -77,10 +77,11 @@ def translate_text(translate_from: str, translate_to: str, input: str) -> str:
         generated_ids[:, model_inputs.shape[1] :], skip_special_tokens=True
     )[0]
 
-    print(generated_text)
-
-    extracted_text = re.search(
-        r'"([^"]*)"',
-        generated_text,
-    ).group(1)
-    return extracted_text
+    try:
+        extracted_text = re.search(
+            r'"([^"]*)"',
+            generated_text,
+        ).group(1)
+        return extracted_text
+    except:
+        return generated_text
