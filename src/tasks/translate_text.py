@@ -107,7 +107,7 @@ language_codes = {
 
 language_translation_image = ImageSpec(
     name="language_translation",
-    registry="samhitaalla",
+    builder="ucimage",
     packages=[
         "transformers==4.36.2",
         "torch==2.2.1",
@@ -116,13 +116,9 @@ language_translation_image = ImageSpec(
         "flytekit==1.10.7",
         "sentencepiece==0.2.0",
         "nltk==3.8.1",
+        "unionai==0.1.5",
     ],
 )
-
-if language_translation_image.is_container():
-    import nltk
-    from nltk import sent_tokenize
-    from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
 
 
 @task(
@@ -132,6 +128,10 @@ if language_translation_image.is_container():
     requests=Resources(mem="10Gi", cpu="3"),
 )
 def translate_text(translate_from: str, translate_to: str, input: str) -> str:
+    import nltk
+    from nltk import sent_tokenize
+    from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
+
     if translate_to not in clone_voice_language_codes:
         raise ValueError(f"{translate_to} language isn't supported by Coqui TTS model.")
 

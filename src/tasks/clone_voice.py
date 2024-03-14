@@ -27,16 +27,16 @@ language_codes = {
 
 clone_voice_image = ImageSpec(
     name="clone_voice",
-    registry="samhitaalla",
-    packages=["TTS==0.22.0", "flytekit==1.10.7"],
+    builder="ucimage",
+    packages=[
+        "TTS==0.22.0",
+        "flytekit==1.10.7",
+        "unionai==0.1.5",
+    ],
     cuda="12.1.0",
     cudnn="8",
     python_version="3.11",
 )
-
-if clone_voice_image.is_container():
-    import torch
-    from TTS.api import TTS
 
 
 @task(
@@ -48,6 +48,9 @@ if clone_voice_image.is_container():
     environment={"COQUI_TOS_AGREED": "1"},
 )
 def clone_voice(text: str, target_lang: str, speaker_wav: FlyteFile) -> FlyteFile:
+    import torch
+    from TTS.api import TTS
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
 

@@ -10,7 +10,7 @@ from flytekit.types.file import FlyteFile
 
 lip_sync_image = ImageSpec(
     name="lip_sync",
-    registry="samhitaalla",
+    builder="ucimage",
     apt_packages=["build-essential", "libssl-dev", "ffmpeg", "libsndfile1", "git"],
     packages=[
         "setuptools==69.1.1",
@@ -23,10 +23,10 @@ lip_sync_image = ImageSpec(
         "imageio==2.27.0",
         "imageio-ffmpeg==0.4.8",
         "librosa==0.10.0.post2",
-        "numba==0.56.4",
+        "numba==0.59.0",
         "resampy==0.4.2",
         "pydub==0.25.1",
-        "scipy==1.9.1",
+        "scipy==1.12.0",
         "kornia==0.6.11",
         "tqdm==4.65.0",
         "yacs==0.1.8",
@@ -35,26 +35,19 @@ lip_sync_image = ImageSpec(
         "scikit-image==0.20.0",
         "basicsr==1.4.2",
         "facexlib==0.3.0",
-        "dlib-bin==19.24.1",
+        "dlib-bin==19.24.2",
         "gfpgan==1.3.8",
         "av==11.0.0",
         "safetensors==0.4.2",
         "huggingface-hub==0.21.4",
         "realesrgan==0.3.0",
         "flytekit==1.10.7",
+        "unionai==0.1.5",
     ],
     cuda="12.1.0",
     cudnn="8",
-    python_version="3.10",
+    python_version="3.11",
 )
-
-if lip_sync_image.is_container():
-    from src.lip_sync_src.facerender.animate import AnimateFromCoeff
-    from src.lip_sync_src.generate_batch import get_data
-    from src.lip_sync_src.generate_facerender_batch import get_facerender_data
-    from src.lip_sync_src.test_audio2coeff import Audio2Coeff
-    from src.lip_sync_src.utils.init_path import init_path
-    from src.lip_sync_src.utils.preprocess import CropAndExtract
 
 
 @task(
@@ -83,6 +76,13 @@ def lip_sync(
     checkpoint_dir: str,
     size: int,
 ) -> FlyteFile:
+    from src.lip_sync_src.facerender.animate import AnimateFromCoeff
+    from src.lip_sync_src.generate_batch import get_data
+    from src.lip_sync_src.generate_facerender_batch import get_facerender_data
+    from src.lip_sync_src.test_audio2coeff import Audio2Coeff
+    from src.lip_sync_src.utils.init_path import init_path
+    from src.lip_sync_src.utils.preprocess import CropAndExtract
+
     audio_path = audio_path.download()
     pic_path = pic_path.download()
 

@@ -8,21 +8,20 @@ from flytekit.types.file import FlyteFile
 
 speech2text_image = ImageSpec(
     name="speech2text",
-    registry="samhitaalla",
+    builder="ucimage",
     apt_packages=["ffmpeg"],
-    packages=["transformers==4.36.2", "torch==2.2.1", "flytekit==1.10.7"],
+    packages=[
+        "transformers==4.36.2",
+        "torch==2.2.1",
+        "flytekit==1.10.7",
+        "unionai==0.1.5",
+    ],
     cuda="12.1.0",
     cudnn="8",
     python_version="3.11",
 )
 
-
-if speech2text_image.is_container():
-    import torch
-    from transformers import pipeline
-    from transformers.pipelines.audio_utils import ffmpeg_read
-
-    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 
 @task(
@@ -39,6 +38,10 @@ def speech2text(
     return_timestamps: bool,
     translate_from: str,
 ) -> str:
+    import torch
+    from transformers import pipeline
+    from transformers.pipelines.audio_utils import ffmpeg_read
+
     pipe = pipeline(
         "automatic-speech-recognition",
         model=checkpoint,
