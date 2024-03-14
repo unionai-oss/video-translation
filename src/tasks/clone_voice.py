@@ -41,7 +41,7 @@ if clone_voice_image.is_container():
 
 @task(
     cache=True,
-    cache_version="1",
+    cache_version="2",
     container_image=clone_voice_image,
     requests=Resources(gpu="1", mem="15Gi"),
     accelerator=T4,

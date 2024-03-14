@@ -1,7 +1,7 @@
 import os
 import shutil
 from pathlib import Path
-from typing import List
+from typing import Optional
 
 import flytekit
 from flytekit import ImageSpec, Resources, task
@@ -59,8 +59,8 @@ if lip_sync_image.is_container():
 
 @task(
     cache=True,
-    cache_version="1",
-    requests=(Resources(gpu="1", mem="10Gi")),
+    cache_version="2",
+    requests=(Resources(gpu="1", mem="30Gi")),
     container_image=lip_sync_image,
     accelerator=T4,
 )
@@ -72,9 +72,9 @@ def lip_sync(
     pose_style: int,
     batch_size: int,
     expression_scale: float,
-    input_yaw_list: List[int],
-    input_pitch_list: List[int],
-    input_roll_list: List[int],
+    input_yaw_list: Optional[list[int]],
+    input_pitch_list: Optional[list[int]],
+    input_roll_list: Optional[list[int]],
     enhancer: str,
     background_enhancer: str,
     device: str,

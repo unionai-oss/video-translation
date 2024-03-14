@@ -1,9 +1,109 @@
-import re
-
 from flytekit import ImageSpec, Resources, task
-from flytekit.extras.accelerators import T4
 
-from .clone_voice import language_codes
+from .clone_voice import language_codes as clone_voice_language_codes
+
+language_codes = {
+    "Afrikaans": "af",
+    "Amharic": "am",
+    "Arabic": "ar",
+    "Asturian": "ast",
+    "Azerbaijani": "az",
+    "Bashkir": "ba",
+    "Belarusian": "be",
+    "Bulgarian": "bg",
+    "Bengali": "bn",
+    "Breton": "br",
+    "Bosnian": "bs",
+    "Catalan; Valencian": "ca",
+    "Cebuano": "ceb",
+    "Czech": "cs",
+    "Welsh": "cy",
+    "Danish": "da",
+    "German": "de",
+    "Greeek": "el",
+    "English": "en",
+    "Spanish": "es",
+    "Estonian": "et",
+    "Persian": "fa",
+    "Fulah": "ff",
+    "Finnish": "fi",
+    "French": "fr",
+    "Western Frisian": "fy",
+    "Irish": "ga",
+    "Gaelic; Scottish Gaelic": "gd",
+    "Galician": "gl",
+    "Gujarati": "gu",
+    "Hausa": "ha",
+    "Hebrew": "he",
+    "Hindi": "hi",
+    "Croatian": "hr",
+    "Haitian; Haitian Creole": "ht",
+    "Hungarian": "hu",
+    "Armenian": "hy",
+    "Indonesian": "id",
+    "Igbo": "ig",
+    "Iloko": "ilo",
+    "Icelandic": "is",
+    "Italian": "it",
+    "Japanese": "ja",
+    "Javanese": "jv",
+    "Georgian": "ka",
+    "Kazakh": "kk",
+    "Central Khmer": "km",
+    "Kannada": "kn",
+    "Korean": "ko",
+    "Luxembourgish; Letzeburgesch": "lb",
+    "Ganda": "lg",
+    "Lingala": "ln",
+    "Lao": "lo",
+    "Lithuanian": "lt",
+    "Latvian": "lv",
+    "Malagasy": "mg",
+    "Macedonian": "mk",
+    "Malayalam": "ml",
+    "Mongolian": "mn",
+    "Marathi": "mr",
+    "Malay": "ms",
+    "Burmese": "my",
+    "Nepali": "ne",
+    "Dutch; Flemish": "nl",
+    "Norwegian": "no",
+    "Northern Sotho": "ns",
+    "Occitan (post 1500)": "oc",
+    "Oriya": "or",
+    "Panjabi; Punjabi": "pa",
+    "Polish": "pl",
+    "Pushto; Pashto": "ps",
+    "Portuguese": "pt",
+    "Romanian; Moldavian; Moldovan": "ro",
+    "Russian": "ru",
+    "Sindhi": "sd",
+    "Sinhala; Sinhalese": "si",
+    "Slovak": "sk",
+    "Slovenian": "sl",
+    "Somali": "so",
+    "Albanian": "sq",
+    "Serbian": "sr",
+    "Swati": "ss",
+    "Sundanese": "su",
+    "Swedish": "sv",
+    "Swahili": "sw",
+    "Tamil": "ta",
+    "Thai": "th",
+    "Tagalog": "tl",
+    "Tswana": "tn",
+    "Turkish": "tr",
+    "Ukrainian": "uk",
+    "Urdu": "ur",
+    "Uzbek": "uz",
+    "Vietnamese": "vi",
+    "Wolof": "wo",
+    "Xhosa": "xh",
+    "Yiddish": "yi",
+    "Yoruba": "yo",
+    "Chinese": "zh",
+    "Zulu": "zu",
+}
 
 language_translation_image = ImageSpec(
     name="language_translation",
@@ -14,74 +114,45 @@ language_translation_image = ImageSpec(
         "accelerate==0.27.2",
         "bitsandbytes==0.43.0",
         "flytekit==1.10.7",
+        "sentencepiece==0.2.0",
+        "nltk==3.8.1",
     ],
-    cuda="12.1.0",
-    cudnn="8",
-    python_version="3.11",
 )
 
 if language_translation_image.is_container():
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+    import nltk
+    from nltk import sent_tokenize
+    from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
 
 
 @task(
     cache=True,
-    cache_version="1",
+    cache_version="2",
     container_image=language_translation_image,
-    requests=Resources(gpu="1", mem="10Gi", cpu="1"),
-    accelerator=T4,
+    requests=Resources(mem="10Gi", cpu="3"),
 )
 def translate_text(translate_from: str, translate_to: str, input: str) -> str:
-    if translate_to not in language_codes:
+    if translate_to not in clone_voice_language_codes:
         raise ValueError(f"{translate_to} language isn't supported by Coqui TTS model.")
 
-    quantization_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-    )
+    if translate_to not in language_codes:
+        raise ValueError(f"{translate_to} language isn't supported by M2M100 model.")
 
-    model = AutoModelForCausalLM.from_pretrained(
-        "mistralai/Mistral-7B-Instruct-v0.2",
-        quantization_config=quantization_config,
-        device_map="auto",
-    )
-    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.2")
+    model = M2M100ForConditionalGeneration.from_pretrained("facebook/m2m100_1.2B")
+    tokenizer = M2M100Tokenizer.from_pretrained("facebook/m2m100_1.2B")
 
-    messages = [
-        {
-            "role": "user",
-            "content": f"""Just generate the translated text without any sort of explanations and notes, and ensure the output is written in English.
-            Translate this text from English to Spanish:
-            What is your favourite condiment?""",
-        },
-        {
-            "role": "assistant",
-            "content": "¿Cuál es tu condimento favorito?",
-        },
-        {
-            "role": "user",
-            "content": f"""Translate this text from {translate_from} to {translate_to}: 
-            {input}""",
-        },
-    ]
+    tokenizer.src_lang = language_codes[translate_from]
 
-    model_inputs = tokenizer.apply_chat_template(messages, return_tensors="pt").to(
-        "cuda" if torch.cuda.is_available() else "cpu"
-    )
+    nltk.download("punkt")
+    result = []
+    for sentence in sent_tokenize(input):
+        encoded_input = tokenizer(sentence, return_tensors="pt")
 
-    generated_ids = model.generate(model_inputs, max_new_tokens=1000, do_sample=True)
+        generated_tokens = model.generate(
+            **encoded_input,
+            forced_bos_token_id=tokenizer.get_lang_id(language_codes[translate_to]),
+        )
+        output = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+        result += output
 
-    generated_text = tokenizer.batch_decode(
-        generated_ids[:, model_inputs.shape[1] :], skip_special_tokens=True
-    )[0]
-
-    try:
-        extracted_text = re.search(
-            r'"([^"]*)"',
-            generated_text,
-        ).group(1)
-        return extracted_text
-    except:
-        return generated_text
+    return " ".join(result).strip()

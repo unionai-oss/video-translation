@@ -27,7 +27,7 @@ if speech2text_image.is_container():
 
 @task(
     cache=True,
-    cache_version="1",
+    cache_version="2",
     container_image=speech2text_image,
     requests=Resources(gpu="1", mem="10Gi", cpu="1"),
     accelerator=T4,

@@ -48,8 +48,8 @@ audio_and_image_values = NamedTuple(
 
 
 @task(
-    # cache=True,
-    # cache_version="1",
+    cache=True,
+    cache_version="2",
     container_image=preprocessing_image,
     requests=Resources(mem="5Gi", cpu="1"),
     accelerator=T4,

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flytekit import workflow
 from flytekit.types.file import FlyteFile
 
@@ -10,23 +12,23 @@ from .tasks.translate_text import translate_text
 
 @workflow
 def video_translation_wf(
-    video_file: FlyteFile = "https://github.com/samhita-alla/video-translation/assets/27777173/f83a02d8-5894-4cf5-af31-c3588ce442a0",
-    translate_from: str = "Chinese",
-    translate_to: str = "English",
+    video_file: FlyteFile = "https://github.com/Zz-ww/SadTalker-Video-Lip-Sync/raw/master/sync_show/original.mp4",
+    translate_from: str = "English",
+    translate_to: str = "German",
     checkpoint: str = "openai/whisper-large-v2",
     output_ext: str = "mp3",
     chunk_length: float = 30.0,
     return_timestamps: bool = False,
-    ref_pose: FlyteFile = "https://github.com/samhita-alla/video-translation/assets/27777173/f83a02d8-5894-4cf5-af31-c3588ce442a0",
-    ref_eyeblink: FlyteFile = "https://github.com/samhita-alla/video-translation/assets/27777173/f83a02d8-5894-4cf5-af31-c3588ce442a0",
+    ref_pose: FlyteFile = "https://github.com/Zz-ww/SadTalker-Video-Lip-Sync/raw/master/sync_show/original.mp4",
+    ref_eyeblink: FlyteFile = "https://github.com/Zz-ww/SadTalker-Video-Lip-Sync/raw/master/sync_show/original.mp4",
     pose_style: int = 0,
     batch_size: int = 2,
     expression_scale: float = 1.0,
-    input_yaw_list: list[int] = [0],
-    input_pitch_list: list[int] = [0],
-    input_roll_list: list[int] = [0],
+    input_yaw_list: Optional[list[int]] = None,
+    input_pitch_list: Optional[list[int]] = None,
+    input_roll_list: Optional[list[int]] = None,
     enhancer: str = "gfpgan",
-    background_enhancer: str = "realesrgan",
+    background_enhancer: str = "",
     device: str = "cuda",
     still: bool = True,
     preprocess: str = "extfull",
@@ -38,7 +40,7 @@ def video_translation_wf(
 
     :param video_file: The video file to translate.
     :param translate_from: The language to translate from.
-    :param translate_to: The language to translate to.
+    :param translate_to: The language to translate to, options are ['English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Polish', 'Turkish', 'Russian', 'Dutch', 'Czech', 'Arabic', 'Chinese', 'Japanese', 'Hungarian', 'Korean', 'Hindi']
     :param checkpoint: Speech-to-text model checkpoint.
     :param output_ext: Output extension for audio files.
     :param chunk_length: Length of audio chunks.
