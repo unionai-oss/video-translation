@@ -17,4 +17,7 @@ Open-source models used:
 
 |                                                             Input video (Chinese)                                                              |                                                                Output (English)                                                                |
 | :--------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: |
-| <video src="https://github.com/samhita-alla/video-translation/assets/27777173/8bc8a760-3a48-444b-a593-6146b5ae8068" type="video/mp4"> </video> | <video src="https://github.com/samhita-alla/video-translation/assets/27777173/9f2e1092-8a3a-4bd1-a951-944b3fe75f43" type="video/mp4"> </video> |
+| <video src="https://github.com/samhita-alla/video-translation/assets/27777173/8bc8a760-3a48-444b-a593-6146b5ae8068" type="video/mp4"> </video> | <video src="https://github.com/unionai-oss/video-translation/assets/27777173/8a08b617-696b-432c-9cb2-cab45dca0451" type="video/mp4"> </video> |
+
+
+
